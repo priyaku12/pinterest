@@ -91,7 +91,7 @@ export default function decorate(block) {
   });
 
   //show more
-  
+
   if (block.classList.contains('big')) {
     // const ul1 = block.querySelector('ul');
 
@@ -171,130 +171,156 @@ export default function decorate(block) {
 
   }
 
-  ul.querySelectorAll('.masonry .cards-card-image').forEach((imageWrapper) => {
-    // Ensure relative position
+  // const ul = document.querySelector('ul'); // make sure ul is defined
+
+  ul.querySelectorAll('.masonry .cards-card-image').forEach(async (imageWrapper) => {
     imageWrapper.style.position = 'relative';
 
     const picture = imageWrapper.querySelector('picture');
     const img = picture?.querySelector('img');
-
     if (!img) return;
 
-    // Create overlay container
+    const rawSrc = img.getAttribute('src') || '';
+    const basePath = 'https://main--pinterest--priyaku12.aem.page';
+    const imgSrc = rawSrc.startsWith('http') ? rawSrc : `${basePath}${rawSrc}`;
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user?.id;
+
+    // --- Create heart icon (white by default) ---
+    const heartIcon = document.createElement('span');
+    heartIcon.className = 'custom-heart';
+    heartIcon.style.cursor = 'pointer';
+    picture.appendChild(heartIcon);
+
+    // --- Determine if image is already a favorite ---
+    let isFavorited = false;
+    try {
+      const favRes = await fetch(`http://localhost:8000/api/isFavCard?userId=${userId}&image=${encodeURIComponent(imgSrc)}`);
+      const favData = await favRes.json();
+      console.log(favData);
+      isFavorited = favData?.favorited === true;
+    } catch (err) {
+      console.error('Error checking favorite:', err);
+    }
+
+    heartIcon.innerHTML = isFavorited ? '❤️' : '🤍';
+
+    // Create overlay with Open button
     const overlay = document.createElement('div');
     overlay.className = 'custom-overlay';
-
-    // "Open" text
     const openText = document.createElement('span');
     openText.className = 'custom-open-text';
     openText.textContent = 'Open';
-
-    // Heart icon
-    const heartIcon = document.createElement('span');
-    heartIcon.className = 'custom-heart';
-    heartIcon.innerHTML = '❤️';
-    
-    // Append both to overlay
     overlay.appendChild(openText);
-    overlay.appendChild(heartIcon);
-
-    // Insert overlay after picture
     picture.insertAdjacentElement('afterend', overlay);
 
-    // ⭐ Add heart click listener
+    // --- Click Listener to Add or Remove ---
     heartIcon.addEventListener('click', () => {
+      if (!userId) {
+        alert("Please login to save into favorites!");
+        return;
+      }
       const li = imageWrapper.closest('li');
-
       const tags = Array.from(li.querySelectorAll('.tag')).map(tag => tag.textContent.trim());
       const title = li.querySelector('h4 strong')?.textContent.trim() || '';
       const description = li.querySelectorAll('h4')[1]?.textContent.trim() || '';
-      console.log("hello");
-      // ✅ Get userId from localStorage (or wherever it's stored after login)
-      // const userId = localStorage.getItem('user.id');
-
-      const rawSrc = img?.getAttribute('src') || '';
-      const basePath = 'https://main--pinterest--priyaku12.aem.page';
-
-      // Prepend full URL if not already absolute
-      const imgSrc = rawSrc.startsWith('http') ? rawSrc : `${basePath}${rawSrc}`;
-
-
-      const user = JSON.parse(localStorage.getItem('user'));
-      const userId = user?.id;
-      console.log("user", userId);
-      if (!userId) {
-        alert('Please log in to save cards.');
-        return;
-      }
 
       const cardData = {
-        userId,        // ✅ send user ID with card
+        userId,
         image: imgSrc,
         tags,
         title,
         description,
       };
 
-      console.log('Saving card:', cardData);
-      
-      // ✅ Send to correct backend API endpoint
-      fetch('http://localhost:8000/api/authFavCard', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(cardData),
-      })
-        .then((res) => {
+      if (!isFavorited) {
+        // Add to favorites
+        fetch('http://localhost:8000/api/authFavCard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cardData),
+        }).then((res) => {
           if (res.ok) {
-            alert('Card saved!');
+            heartIcon.innerHTML = '❤️';
+            isFavorited = true;
           } else {
             alert('Failed to save card.');
           }
-        })
-        .catch((err) => {
+        }).catch(err => {
           console.error('Error saving card:', err);
         });
+      } else {
+        // Remove from favorites
+        fetch('http://localhost:8000/api/removeFavCard', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, image: imgSrc }),
+        })
+          .then((res) => {
+            if (res.ok) {
+              heartIcon.innerHTML = '🤍';
+
+              // If on favorites page, remove card from UI
+              if (window.location.pathname.includes('favorites')) {
+                li.remove();
+              }
+            } else {
+              alert('Failed to remove card.');
+            }
+          })
+          .catch(err => {
+            console.error('Error removing card:', err);
+          });
+      }
     });
   });
 
+
   //fav
-
-
-
-
-
-
-
-// fav mas
   const favUl = document.querySelector('.cards.mas.block ul');
 
   // 👇 Get the logged-in user ID from localStorage
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id;
-   console.log("user", userId);
-  if (block.classList.contains("mas")) {
-  block.classList.add("masonry");
-}
-  if (!userId) {
-    alert('Please log in to view favorites.');
-  } else {
-    fetch(`http://localhost:8000/api/authFavCard?userId=${userId}`)
-      .then(res => res.json())
-      .then(cardsData => {
-         console.log("Fetched Cards:", cardsData);
-        cardsData.forEach((card) => {
-          const li = document.createElement('li');
-          const tagHTML = card.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+  console.log("user", userId);
 
-          li.innerHTML = `
+  // Apply masonry class if needed
+  if (block.classList.contains("mas")) {
+    block.classList.add("masonry");
+  }
+
+
+  fetch(`http://localhost:8000/api/authFavCard?userId=${userId}`)
+    .then(res => res.json())
+    .then(cardsData => {
+      console.log("Fetched Cards:", cardsData);
+      if (cardsData.length == 0) {
+        const favo= document.querySelector(".favourite h1");
+        favo.style.display = 'none';
+
+        // console.log("vds");
+        const favBlock = document.querySelector(".mas");
+        // console.log(favBlock);
+        const head = document.createElement("h2");
+        head.innerHTML = "NO FAVOURITES FOUND";
+        head.className = "nofav";
+        favBlock.append(head);
+        return;
+      }
+      cardsData.forEach((card) => {
+        const li = document.createElement('li');
+
+        const tagHTML = card.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+
+        li.innerHTML = `
           <div class="cards-card-image" style="position: relative;">
             <picture>
               <img src="${card.image}" alt="">
+              <span class="custom-heart">❤️</span>
             </picture>
             <div class="custom-overlay">
               <span class="custom-open-text">Open</span>
-              <span class="custom-heart">❤️</span>
             </div>
           </div>
           <div class="cards-card-body">
@@ -307,16 +333,38 @@ export default function decorate(block) {
             <h4>${card.description}</h4>
           </div>
         `;
-          favUl.appendChild(li);
+
+        // 💔 Add remove-from-favorites click handler
+        const heartIcon = li.querySelector('.custom-heart');
+        heartIcon.addEventListener('click', () => {
+          const confirmRemove = confirm('Remove this card from favorites?');
+          if (!confirmRemove) return;
+
+          fetch('http://localhost:8000/api/removeFavCard', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: userId,
+              image: card.image,
+            }),
+          })
+            .then(res => {
+              if (res.ok) {
+                li.remove(); // remove from DOM
+              } else {
+                alert('Failed to remove card.');
+              }
+            })
+            .catch(err => {
+              console.error('Error removing card:', err);
+            });
         });
-      })
-      .catch(err => {
-        console.error('Error loading favorite cards:', err);
+
+        favUl.appendChild(li);
       });
-  }
-
-
-
-
+    })
+    .catch(err => {
+      console.error('Error loading favorite cards:', err);
+    });
 
 }

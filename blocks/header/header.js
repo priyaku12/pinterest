@@ -9,7 +9,7 @@ export default async function decorate(block) {
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
   const fragment = await loadFragment(navPath);
-
+const user = JSON.parse(localStorage.getItem('user'));
   // decorate nav DOM
   block.textContent = '';
   const nav = document.createElement('nav');
@@ -21,7 +21,13 @@ export default async function decorate(block) {
     const section = nav.children[i];
     if (section) section.classList.add(`nav-${c}`);
   });
-
+if (!user)
+  {
+   
+   const link1 = nav.querySelector(".nav-favorites");
+   const lin=link1.querySelector("div>p>a");
+      lin.href ="/login";
+  }
   const navBrand = nav.querySelector('.nav-brand');
   const brandLink = navBrand.querySelector('.button');
   if (brandLink) {
@@ -42,6 +48,7 @@ if (toolsSection) {
 }
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';
+  
   navWrapper.append(nav);
   block.append(navWrapper);
 
@@ -49,8 +56,8 @@ if (toolsSection) {
     // Add logout if user is already logged in
   const loginSection = nav.querySelector('.nav-login');
   if (loginSection) {
-    const user = JSON.parse(localStorage.getItem('user'));
-
+    
+    
     if (user) {
       loginSection.textContent = ''; // Clear existing content
       const logoutBtn = document.createElement('button');
@@ -62,7 +69,6 @@ if (toolsSection) {
         localStorage.removeItem('user');
         window.location.reload(); // Refresh to reflect logout
       });
-
       loginSection.appendChild(logoutBtn);
     } 
   }

@@ -348,7 +348,7 @@
   right: 12px;
   font-size: 20px;
   color: white;
-  z-index: 100;
+  z-index: 2;
   pointer-events: auto;
   cursor: pointer;
 }
@@ -378,3 +378,9 @@
   font-size: 20px;
 }
 
+
+.nofav{
+  text-align: center;
+  margin: 16px;
+  margin-top: 10%;
+}
