@@ -348,7 +348,7 @@
   right: 12px;
   font-size: 20px;
   color: white;
-  z-index: 2;
+  z-index: 100;
   pointer-events: auto;
   cursor: pointer;
 }
@@ -371,4 +371,10 @@
       
 }
 
-  
+  .custom-heart-wrapper {
+  cursor: pointer;
+  display: inline-flex;
+  gap: 4px;
+  font-size: 20px;
+}
+
