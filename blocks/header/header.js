@@ -44,4 +44,28 @@ if (toolsSection) {
   navWrapper.className = 'nav-wrapper';
   navWrapper.append(nav);
   block.append(navWrapper);
+
+
+    // Add logout if user is already logged in
+  const loginSection = nav.querySelector('.nav-login');
+  if (loginSection) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (user) {
+      loginSection.textContent = ''; // Clear existing content
+      const logoutBtn = document.createElement('button');
+      logoutBtn.textContent = 'Logout';
+    //  logoutBtn.className = 'logout-button';
+      logoutBtn.style.cursor = 'pointer';
+
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('user');
+        window.location.reload(); // Refresh to reflect logout
+      });
+
+      loginSection.appendChild(logoutBtn);
+    } 
+  }
+
 }
+

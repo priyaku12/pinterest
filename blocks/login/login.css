@@ -3,23 +3,28 @@
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  width: 300px;
-  margin: 100px auto;
+  width: 90%;
+  max-width: 400px;
+  margin: 10vh auto; /* Vertical centering with some spacing */
   font-family: sans-serif;
   text-align: center;
+  box-sizing: border-box;
 }
 
+/* Input fields */
 .login-box input {
-  width: 100%;
-  padding: 10px;
+  width: 90%;
+  padding: 12px;
   margin: 10px 0;
   border: 1px solid #ccc;
   border-radius: 6px;
+  font-size: 16px;
 }
 
+/* Button */
 .login-box button {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background-color: #007bff;
   color: #fff;
   border: none;
@@ -32,7 +37,37 @@
   background-color: #0056b3;
 }
 
+/* Message display */
 .login-box .message {
   margin-top: 12px;
   font-size: 14px;
+}
+
+/* Responsive for tablets */
+@media (max-width: 900px) {
+  .login-box {
+    padding: 24px;
+    font-size: 15px;
+  }
+
+  .login-box input,
+  .login-box button {
+    font-size: 15px;
+    padding: 10px;
+  }
+}
+
+/* Responsive for phones */
+@media (max-width: 600px) {
+  .login-box {
+    padding: 20px;
+    font-size: 14px;
+    margin: 6vh auto;
+  }
+
+  .login-box input,
+  .login-box button {
+    font-size: 14px;
+    padding: 10px;
+  }
 }
