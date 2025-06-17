@@ -2,23 +2,17 @@ indices:
   pinterest:
     include:
       - '**'
-    exlude: []
     target: /query-index.json
     properties:
       title:
-        select: head > meta[property="og:title"], head > meta[name="title"]
-        value: attribute(el,'content')
-         
+        select: head > meta[name="title"], head > meta[property="og:title"]
+        value: |
+          attribute(el, 'content')
       description:
-        select: head > meta[name="description"]
-        value: attribute(el,'content')
- 
+        select: head > meta[name="description"], head > meta[property="og:description"]
+        value: |
+          attribute(el, 'content')
       image:
-        select: head > meta[property="og:image"]
-        value: attribute(el,'content')
- 
-      tags:
-        select: head > meta[property="og:tags"]
-        value: attribute(el,'content')
- 
-   
+        select: head > meta[name="image"], head > meta[property="og:image"]
+        value: |
+          attribute(el, 'content')
