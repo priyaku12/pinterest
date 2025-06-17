@@ -6,10 +6,13 @@ indices:
     properties:
       title:
         select: head > meta[name="title"], head > meta[property="og:title"]
-        value: attribute(el, 'content')
+        value: |
+          attribute(el, 'content')
       description:
         select: head > meta[name="description"], head > meta[property="og:description"]
-        value: attribute(el, 'content')
+        value: |
+          attribute(el, 'content')
       image:
         select: head > meta[name="image"], head > meta[property="og:image"]
-        value: attribute(el, 'content')
+        value: |
+          attribute(el, 'content')
