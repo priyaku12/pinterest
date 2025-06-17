@@ -156,7 +156,11 @@ if (searchInput && resultsContainer) {
   }
 
   // Show suggestions on focus
+ const getn = document.querySelector('.nav-tools .default-content-wrapper');
   searchInput.addEventListener('focus', () => {
+    if (getn) {
+    getn.style.border = '3px solid #8ca9e5';
+  }
     resultsContainer.style.display = 'block';
     showSuggestions();
   });

@@ -166,11 +166,12 @@ header nav .nav-tools {
     border-radius: 12px;
     flex-direction: column;
   }
-  
-  .nav-tools .default-content-wrapper p{
+
+  .nav-tools .default-content-wrapper p {
     width: 100%;
     height: 100%;
   }
+
   .nav-tools .default-content-wrapper p .nav-search {
     background-color: #ffffff00;
     border: none;
@@ -215,16 +216,19 @@ header nav .nav-tools {
     align-content: center;
     justify-self: anchor-center;
   }
-  header .nav-brand .default-content-wrapper p .icon{
-     width: 20px;
-    height: 20px; 
+
+  header .nav-brand .default-content-wrapper p .icon {
+    width: 20px;
+    height: 20px;
     padding-right: 3px;
   }
+
   header nav .nav-brand img {
     width: 20px;
     height: 20px;
   }
 }
+
 /* Popup suggestion box */
 .suggestion-popup {
   display: none;
@@ -236,7 +240,7 @@ header nav .nav-tools {
   width: 100%;
   z-index: 1000;
   max-width: 800px;
-  top: 80%;
+  top: 82%;
 
 }
 
@@ -260,7 +264,7 @@ header nav .nav-tools {
   align-items: center;
   background-color: #f4f4f4;
   border-radius: 12px;
-  padding: 10px;
+  /* padding: 10px; */
   cursor: pointer;
   transition: background 0.3s ease;
 }
@@ -271,8 +275,8 @@ header nav .nav-tools {
 
 /* Image inside card */
 .suggestion-image {
-  width: 40px;
-  height: 40px;
+  height: 72.2356px;
+  width: 72.2356px;
   object-fit: cover;
   border-radius: 8px;
   margin-right: 10px;
@@ -281,9 +285,13 @@ header nav .nav-tools {
 /* Title */
 .suggestion-title {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   color: #333;
+  max-height: 72.2356px;
+  max-width: 115.577px;
+  padding: 16px;
 }
+
 .nav-search:focus {
   outline: none;
   border: none;
@@ -292,5 +300,3 @@ header nav .nav-tools {
 
 
 /*  */
-
-
