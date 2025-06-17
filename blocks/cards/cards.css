@@ -365,13 +365,13 @@
 
 
 .show-more-button {
-      display: block;
-      margin: 24px auto 0;
-     
-      
+  display: block;
+  margin: 24px auto 0;
+
+
 }
 
-  .custom-heart-wrapper {
+.custom-heart-wrapper {
   cursor: pointer;
   display: inline-flex;
   gap: 4px;
@@ -379,8 +379,39 @@
 }
 
 
-.nofav{
+.nofav {
   text-align: center;
   margin: 16px;
   margin-top: 10%;
+}
+
+
+
+.filter ul {
+  height: 50px;
+  display: flex;
+  scrollbar-width: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.filter li {
+  display: flex;
+  flex: 0 0 auto;
+  background-color: rgb(153, 203, 153);
+  border-radius: 18px;
+  
+}
+.filter li .cards-card-image img{
+  height: 100%;
+  width: 100%;
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+}
+.filter .cards-card-body {
+  margin: 0px;
+}
+
+.filter .cards-card-body  p{
+  margin: 10px 10px;
 }

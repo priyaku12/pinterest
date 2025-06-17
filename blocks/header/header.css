@@ -160,14 +160,17 @@ header nav .nav-tools {
   .nav-tools .default-content-wrapper {
     display: flex;
     align-items: anchor-center;
-    padding: 0 8px 0 16px;
     background-color: #F1F1F1;
     height: 48px;
     /* width:auto; */
-
     border-radius: 12px;
+    flex-direction: column;
   }
-
+  
+  .nav-tools .default-content-wrapper p{
+    width: 100%;
+    height: 100%;
+  }
   .nav-tools .default-content-wrapper p .nav-search {
     background-color: #ffffff00;
     border: none;
@@ -175,6 +178,8 @@ header nav .nav-tools {
     font-size: 16px;
     /* width: auto; */
     font-weight: normal;
+    width: 90%;
+    height: 100%;
   }
 
   .nav-login .default-content-wrapper p a {
@@ -220,3 +225,72 @@ header nav .nav-tools {
     height: 20px;
   }
 }
+/* Popup suggestion box */
+.suggestion-popup {
+  display: none;
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  width: 100%;
+  z-index: 1000;
+  max-width: 800px;
+  top: 80%;
+
+}
+
+/* Heading */
+.suggestion-heading {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Grid layout */
+.suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+/* Suggestion card */
+.suggestion-card {
+  display: flex;
+  align-items: center;
+  background-color: #f4f4f4;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.suggestion-card:hover {
+  background-color: #e6e6e6;
+}
+
+/* Image inside card */
+.suggestion-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 10px;
+}
+
+/* Title */
+.suggestion-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+.nav-search:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+
+/*  */
+
+
