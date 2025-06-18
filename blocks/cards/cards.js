@@ -33,7 +33,7 @@ export default function decorate(block) {
 
   if (block.classList.contains('big')) {
     const liItems = Array.from(ul.querySelectorAll('li'));
-    const showLimit = 6;
+    const showLimit = 3;
 
     if (liItems.length <= showLimit) return;
 
