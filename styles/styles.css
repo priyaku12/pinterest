@@ -19,7 +19,10 @@
   --link-color-grey:#e0e0d9;
   --link-color-red: #e60023;
   --link-hover-color: #d1d1c7;
-
+  --card-body:rgb(0, 0, 0, 0.4);
+  --card-filter: rgb(153, 203, 153);
+  --border-color:#ccc;
+  --search-icon :rgb(241, 241, 241);
   /* fonts */
   --body-font-family: 'Pin Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Helvetica, 'ヒラギノ角ゴ Pro W3', 'メイリオ', Meiryo, 'ＭＳ Ｐゴシック', Arial, sans-serif;;
   --heading-font-family: 'Pin Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Helvetica, 'ヒラギノ角ゴ Pro W3', 'メイリオ', Meiryo, 'ＭＳ Ｐゴシック', Arial, sans-serif;;

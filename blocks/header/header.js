@@ -165,13 +165,6 @@ if (searchInput && resultsContainer) {
     showSuggestions();
   });
 
-  // Optional: hide on blur
-//   searchInput.addEventListener('blur', () => {
-//     setTimeout(() => {
-//       resultsContainer.style.display = 'none';
-//     }, 200);
-//   });
-// Hide popup when clicking outside search input or results
 document.addEventListener('click', (e) => {
   const isClickInsideSearch = searchInput.contains(e.target);
   const isClickInsidePopup = resultsContainer.contains(e.target);
