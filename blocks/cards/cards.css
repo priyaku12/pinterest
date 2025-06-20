@@ -310,6 +310,8 @@
   color: #666;
   min-width: 24px;
   min-height: 24px;
+  width: 10px;
+  height: 10px;
 }
 
 .cards.masonry .scroll-arrow svg {
