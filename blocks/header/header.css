@@ -1,4 +1,9 @@
 /* header and nav layout */
+header nav p {
+  margin: 0;
+  line-height: 1;
+}
+
 header .nav-wrapper {
   background-color: var(--background-color);
   width: 100%;
@@ -23,8 +28,12 @@ header nav {
   display: none;
 }
 
+header nav a:any-link {
+  color: currentcolor;
+}
+
 .nav-brand .default-content-wrapper p a {
-  padding: 0px;
+  padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,22 +41,13 @@ header nav {
 
 .nav-favorites .default-content-wrapper p a {
   background-color: transparent;
-  padding: 0px;
-}
-
-.nav-favorites .default-content-wrapper p a {
-  float: right;
-  padding-right: 10px;
-  margin: 0px;
+  padding: 0;
 }
 
 .nav-login .default-content-wrapper p a {
   font-size: 14px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-right: 16px;
-  padding-left: 16px;
-  margin: 0px;
+  padding: 8px 16px;
+  margin: 0;
 }
 
 .nav-sections .default-content-wrapper p {
@@ -57,14 +57,8 @@ header nav {
   line-height: 1.4;
 }
 
-header nav p {
-  margin: 0;
-  line-height: 1;
-}
 
-header nav a:any-link {
-  color: currentcolor;
-}
+
 
 /* brand */
 header .nav-brand {
@@ -98,7 +92,7 @@ header nav .nav-tools {
   display: none;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 10%);
   position: relative;
   width: 96%;
   padding: 3%;
@@ -126,6 +120,7 @@ header nav .nav-tools {
   align-items: center;
   background-color: #f4f4f4;
   border-radius: 12px;
+
   /* padding: 10px; */
   cursor: pointer;
   transition: background 0.3s ease;
@@ -170,7 +165,7 @@ header nav .nav-tools {
 
 
 
-@media (min-width: 768px) and (max-width: 899px) {
+@media (width >= 768px) and (width <= 899px) {
   header nav {
       grid-template-columns: 13% 8% 60% 3% 11%;
       gap: 1%;
@@ -178,11 +173,8 @@ header nav .nav-tools {
 
   .nav-login .default-content-wrapper p a {
     font-size: 16px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-right: 16px;
-    padding-left: 16px;
-    margin: 0px;
+    padding: 8px 16px;
+    margin: 0;
     height: 44px;
     width: 77px;
     float: right;
@@ -195,14 +187,10 @@ header nav .nav-tools {
     /* display: flex; */
     grid-template-columns: 11% 8% 66% 2%;
     justify-content: space-between;
-
     padding-left: 4%;
     padding-right: 4%;
   }
 
-  .nav-tools .default-content-wrapper {
-    display: flex;
-  }
 
   header nav .nav-sections {
     display: block;
@@ -216,9 +204,11 @@ header nav .nav-tools {
 
   .nav-tools .default-content-wrapper {
     display: flex;
-    align-items: anchor-center;
+
+    /* align-items: anchor-center; */
     background-color: #F1F1F1;
     height: 48px;
+
     /* width:auto; */
     border-radius: 12px;
     flex-direction: column;
@@ -234,23 +224,22 @@ header nav .nav-tools {
     border: none;
     color: #333;
     font-size: 16px;
+
     /* width: auto; */
     font-weight: normal;
     width: 90%;
+
     /* height: 95%; */
     padding: 13px;
-    padding-left: 0px;
+    padding-left: 0;
     position: relative;
     top: -4px;
   }
 
   .nav-login .default-content-wrapper p a {
     font-size: 16px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-right: 16px;
-    padding-left: 16px;
-    margin: 0px;
+    padding: 8px 16px;
+    margin: 0;
     height: 44px;
     width: 77px;
     float: right;
@@ -265,17 +254,18 @@ header nav .nav-tools {
   header .nav-brand .default-content-wrapper p a {
     height: 48px;
     font-size: 20px;
-    font-weight: 700F
+    font-weight: 700;
   }
 
   .nav-sections .default-content-wrapper p {
-    padding: 0px 16px;
+    padding: 0 16px;
     border-radius: 24px;
     background-color: var(--dark-color);
     color: var(--background-color);
     height: 48px;
     align-content: center;
-    justify-self: anchor-center;
+
+    /* justify-self: anchor-center; */
   }
 
   header .nav-brand .default-content-wrapper p .icon {

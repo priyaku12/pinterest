@@ -137,8 +137,10 @@ export default function decorate(block) {
     const heartIco = document.getElementById('custom-heart'); // your element
     const redheart = '/icons/favredheart.svg';
     const whiteheart = '/icons/white-heart.svg';
+    
 
     const iconPath = isFavorited ? redheart : whiteheart;
+    console.log("ic", iconPath);
     async function loadIcon() {
       const iconPath = isFavorited ? redheart : whiteheart;
       try {
@@ -151,6 +153,7 @@ export default function decorate(block) {
     }
 
     loadIcon();
+    console.log("hf", heartIco.innerHTML);
 
     // Create overlay with Open button
     const overlay = document.createElement('div');
@@ -180,8 +183,6 @@ export default function decorate(block) {
         description,
       };
 
-
-
       if (!isFavorited) {
         // Add to favorites
         fetch(`${config.backendUrl}/authFavCard`, {
@@ -190,8 +191,8 @@ export default function decorate(block) {
           body: JSON.stringify(cardData),
         }).then((res) => {
           if (res.ok) {
-            isFavorited = true;   // Update the flag
-            loadIcon();
+            heartIcon.innerHTML = '❤️';
+            isFavorited = true;
           } else {
             alert('Failed to save card.');
           }
@@ -207,8 +208,7 @@ export default function decorate(block) {
         })
           .then((res) => {
             if (res.ok) {
-              isFavorited = false;    // Update the flag
-              loadIcon();
+              heartIcon.innerHTML = '🤍';
 
               // If on favorites page, remove card from UI
               if (window.location.pathname.includes('favorites')) {
@@ -328,10 +328,7 @@ export default function decorate(block) {
           <div class="cards-card-image" style="position: relative;">
             <picture>
               <img src="${card.image}" alt="">
-               <span class="custom-heart">
-               <img src="/icons/favredheart.svg" alt="Favorite" width="24" height="24" />
-              </span>
-              
+              <span class="custom-heart">❤️</span>
             </picture>
             <div class="custom-overlay">
               <span class="custom-open-text">Open</span>
@@ -348,7 +345,7 @@ export default function decorate(block) {
           </div>
         `;
 
-
+        // 💔 Add remove-from-favorites click handler
         const heartIcon = li.querySelector('.custom-heart');
         heartIcon.addEventListener('click', () => {
           const confirmRemove = confirm('Remove this card from favorites?');
