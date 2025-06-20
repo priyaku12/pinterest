@@ -1,40 +1,52 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
+
 const config = await fetch('/config.json').then((res) => res.json());
 
 function addShowMore(containerClassName, visibleCount) {
   const container = document.querySelector(`.${containerClassName}`);
   if (!container) return;
+
   const ul = container.querySelector('ul');
   if (!ul) return;
-  const liItems = Array.from(ul.querySelectorAll('li'));
-  if (liItems.length <= visibleCount) return;
-  // Hide items beyond visibleCount
-  liItems.forEach((li, index) => {
-    if (index >= visibleCount) {
-      li.style.display = 'none';
-      li.classList.add('hidden-card');
+
+  // Clone and remove all cards from the DOM
+  const allCards = Array.from(ul.querySelectorAll('li'));
+  ul.innerHTML = ''; // Clear list to lazy-load cards
+
+  let currentIndex = 0;
+
+  function renderNextBatch() {
+    const end = Math.min(currentIndex + visibleCount, allCards.length);
+    for (let i = currentIndex; i < end; i++) {
+      ul.appendChild(allCards[i]);
     }
-  });
-  // Create and append "See More" button
+    currentIndex = end;
+
+    if (currentIndex >= allCards.length) {
+      showMoreBtn.remove(); // All items loaded
+    }
+  }
+
+  // Initial render
+  renderNextBatch();
+
+  // Create and append "Show More" button
   const showMoreBtn = document.createElement('button');
   showMoreBtn.className = 'show-more-button';
-  showMoreBtn.textContent = 'See More';
-  container.append(showMoreBtn);
-  showMoreBtn.addEventListener('click', () => {
-    const hiddenCards = ul.querySelectorAll('.hidden-card');
-    hiddenCards.forEach((card) => {
-      card.style.display = '';
-      card.classList.remove('hidden-card');
-    });
-    showMoreBtn.remove();
-  });
+  showMoreBtn.textContent = 'Show More';
+  container.appendChild(showMoreBtn);
+  showMoreBtn.addEventListener('click', renderNextBatch);
 }
+
 function transformBlockToList(block) {
   const ul = document.createElement('ul');
   [...block.children].forEach((row) => {
     const li = document.createElement('li');
     while (row.firstElementChild) {
       li.append(row.firstElementChild);
+    }
+    if (block.classList.contains('filter')) {
+      li.style.backgroundColor = getRandomColor();
     }
     [...li.children].forEach((div) => {
       if (div.children.length === 1 && div.querySelector('picture')) {
@@ -48,7 +60,7 @@ function transformBlockToList(block) {
   // Optimize pictures
   ul.querySelectorAll('picture > img').forEach((img) => {
     img.closest('picture').replaceWith(
-      createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }])
+      createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }]),
     );
   });
   // Clear and append new list
@@ -105,6 +117,7 @@ function createOverlay(picture) {
   overlay.appendChild(openText);
   picture.insertAdjacentElement('afterend', overlay);
 }
+
 async function createHeartIcon(picture, imgSrc, li, userId, config, isOnFavoritesPage) {
   let isFavorited = false;
   const heartIcon = document.createElement('span');
@@ -129,7 +142,7 @@ async function createHeartIcon(picture, imgSrc, li, userId, config, isOnFavorite
     const res = await fetch(`${config.backendUrl}/isFavCard?userId=${userId}&image=${encodeURIComponent(imgSrc)}`);
     const data = await res.json();
     isFavorited = data?.favorited === true;
-  } catch {}
+  } catch { }
 
   await loadIcon();
 
@@ -139,18 +152,20 @@ async function createHeartIcon(picture, imgSrc, li, userId, config, isOnFavorite
       return;
     }
 
-    const tags = Array.from(li.querySelectorAll('.tag')).map(tag => tag.textContent.trim());
+    const tags = Array.from(li.querySelectorAll('.tag')).map((tag) => tag.textContent.trim());
     const title = li.querySelector('h4 strong')?.textContent.trim() || '';
     const description = li.querySelectorAll('h4')[1]?.textContent.trim() || '';
 
-    const cardData = { userId, image: imgSrc, tags, title, description };
+    const cardData = {
+      userId, image: imgSrc, tags, title, description,
+    };
 
     if (!isFavorited) {
       fetch(`${config.backendUrl}/authFavCard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cardData),
-      }).then(res => {
+      }).then((res) => {
         if (res.ok) {
           isFavorited = true;
           loadIcon();
@@ -163,7 +178,7 @@ async function createHeartIcon(picture, imgSrc, li, userId, config, isOnFavorite
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, image: imgSrc }),
-      }).then(res => {
+      }).then((res) => {
         if (res.ok) {
           isFavorited = false;
           loadIcon();
@@ -175,150 +190,146 @@ async function createHeartIcon(picture, imgSrc, li, userId, config, isOnFavorite
     }
   });
 }
-
+function getRandomColor() {
+  const hue = Math.floor(Math.random() * 360);
+  const saturation = 70 + Math.random() * 10; // 70-80%
+  const lightness = 80 + Math.random() * 10; // 80-90%
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
 export default function decorate(block) {
-  const user = JSON.parse(localStorage.getItem('user'));
-  const userId = user?.id;
   // limit show more button big
   if (block.classList.contains('big') || block.classList.contains('category')) {
-  transformBlockToList(block);
-  if (block.classList.contains('big')) {
-    addShowMore('big', 3);
-  }
-  if (block.classList.contains('category')) {
-    addShowMore('category', 5);
-  }
-}
-
-if (block.classList.contains('filter')) {
-  transformBlockToList(block);
-}
-// masonry loayout
-if (block.classList.contains('masonry')) {
-  // Transform block and add masonry class
-  transformBlockToList(block);
-  block.classList.add('masonry');
-  const ul = block.querySelector('ul');
-
-  // Create tag scrollers
-  block.querySelectorAll('.cards.masonry li p').forEach(p => {
-    createTagScrollerFromParagraph(p);
-  });
-
-  // Process each image wrapper
-  const wrappers = ul.querySelectorAll('.cards-card-image');
-
-  (async () => {
-    for (const imageWrapper of wrappers) {
-      const li = imageWrapper.closest('li');
-      const picture = imageWrapper.querySelector('picture');
-      const img = picture?.querySelector('img');
-      if (!img) continue;
-
-      imageWrapper.style.position = 'relative';
-
-      const rawSrc = img.getAttribute('src') || '';
-      const basePath = 'https://main--pinterest--priyaku12.aem.page';
-      const imgSrc = rawSrc.startsWith('http') ? rawSrc : `${basePath}${rawSrc}`;
-
-      await createHeartIcon(
-        picture,
-        imgSrc,
-        li,
-        userId,
-        config,
-        window.location.pathname.includes('favorites'),
-      );
-
-      createOverlay(picture);
+    transformBlockToList(block);
+    if (block.classList.contains('big')) {
+      addShowMore('big', 3);
     }
-  })();
-}
-if (block.classList.contains('dyanmic')) {
- block.classList.add('masonry');
- let favUl = block.querySelector('ul');
-  if (!favUl) {
-    favUl = document.createElement('ul');
-    block.appendChild(favUl);
+    if (block.classList.contains('category')) {
+      addShowMore('category', 5);
+    }
   }
-  fetch(`${config.backendUrl}/authFavCard?userId=${userId}`)
-    .then((res) => res.json())
-    .then((cardsData) => {
-      if (!cardsData || cardsData.length === 0) {
-        const favo = document.querySelector('.favourite h1');
-        if (favo) favo.style.display = 'none';
 
-        const head = document.createElement('h2');
-        head.textContent = 'NO FAVOURITES FOUND';
-        head.className = 'nofav';
-        block.append(head);
-        return;
-      }
+  if (block.classList.contains('filter')) {
+    transformBlockToList(block);
+  }
+  // masonry layout
+  if (block.classList.contains('masonry')) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user?.id;
 
-      cardsData.forEach((card) => {
-        const li = document.createElement('li');
-        const imageDiv = document.createElement('div');
-        imageDiv.className = 'cards-card-image';
-        imageDiv.style.position = 'relative';
-
-        const picture = document.createElement('picture');
-        const img = document.createElement('img');
-        img.src = card.image;
-        img.alt = '';
-        picture.appendChild(img);
-        const heartIcon = document.createElement('span');
-        heartIcon.className = 'custom-heart';
-        heartIcon.style.cursor = 'pointer';
-
-        const heartImg = document.createElement('img');
-        heartImg.src = '/icons/favredheart.svg';
-        heartImg.alt = 'Favorite';
-        heartImg.width = 24;
-        heartImg.height = 24;
-        heartIcon.appendChild(heartImg);
-        picture.appendChild(heartIcon);
-        imageDiv.appendChild(picture);
-        createOverlay(picture);
-
-        const bodyDiv = document.createElement('div');
-        bodyDiv.className = 'cards-card-body';
-
-        const fakeParagraph = document.createElement('p');
-        fakeParagraph.textContent = card.tags.map(tag => `[${tag}]`).join(' ');
-        createTagScrollerFromParagraph(fakeParagraph);
-        bodyDiv.appendChild(fakeParagraph);
-
-        const titleEl = document.createElement('h4');
-        titleEl.innerHTML = `<strong>${card.title}</strong>`;
-        const descEl = document.createElement('h4');
-        descEl.textContent = card.description;
-        bodyDiv.append(titleEl, descEl);
-
-        li.append(imageDiv, bodyDiv);
-        favUl.appendChild(li);
-
-        heartIcon.addEventListener('click', () => {
-          fetch(`${config.backendUrl}/removeFavCard`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, image: card.image }),
-          })
-            .then((res) => {
-              if (res.ok) {
-                li.remove();
-              } else {
-                alert('Failed to remove card.');
-              }
-            })
-            .catch((err) => {
-              console.error('Error removing card:', err);
-            });
-        });
+    // static block
+    if (block.classList.contains('static')) {
+      transformBlockToList(block);
+      const ul = block.querySelector('ul');
+      block.querySelectorAll('.cards.masonry li p').forEach((p) => {
+        createTagScrollerFromParagraph(p);
       });
-    })
-    .catch((err) => {
-      console.error('Error loading favorite cards:', err);
-    });
-}
+      // Process each image wrapper
+      const wrappers = ul.querySelectorAll('.cards-card-image');
 
+      (async () => {
+        for (const imageWrapper of wrappers) {
+          const li = imageWrapper.closest('li');
+          const picture = imageWrapper.querySelector('picture');
+          const img = picture?.querySelector('img');
+          if (!img) continue;
+
+          imageWrapper.style.position = 'relative';
+          const rawSrc = img.getAttribute('src') || '';
+          const basePath = 'https://main--pinterest--priyaku12.aem.page';
+          const imgSrc = rawSrc.startsWith('http') ? rawSrc : `${basePath}${rawSrc}`;
+
+          createHeartIcon(
+            picture,
+            imgSrc,
+            li,
+            userId,
+            config,
+            window.location.pathname.includes('favorites'),
+          );
+          createOverlay(picture);
+        }
+      })();
+    }
+    if (block.classList.contains('dyanmic')) {
+      let favUl = block.querySelector('ul');
+      if (!favUl) {
+        favUl = document.createElement('ul');
+        block.appendChild(favUl);
+      }
+      fetch(`${config.backendUrl}/authFavCard?userId=${userId}`)
+        .then((res) => res.json())
+        .then((cardsData) => {
+          if (!cardsData || cardsData.length === 0) {
+            const favo = document.querySelector('.favourite h1');
+            if (favo) favo.style.display = 'none';
+            const head = document.createElement('h2');
+            head.textContent = 'NO FAVOURITES FOUND';
+            head.className = 'nofav';
+            block.append(head);
+            return;
+          }
+          cardsData.forEach((card) => {
+            const li = document.createElement('li');
+            const imageDiv = document.createElement('div');
+            imageDiv.className = 'cards-card-image';
+            imageDiv.style.position = 'relative';
+
+            const picture = document.createElement('picture');
+            const img = document.createElement('img');
+            img.src = card.image;
+            img.alt = '';
+            picture.appendChild(img);
+            const heartIcon = document.createElement('span');
+            heartIcon.className = 'custom-heart';
+            heartIcon.style.cursor = 'pointer';
+
+            const heartImg = document.createElement('img');
+            heartImg.src = '/icons/favredheart.svg';
+            heartImg.alt = 'Favorite';
+            heartImg.width = 24;
+            heartImg.height = 24;
+            heartIcon.appendChild(heartImg);
+            picture.appendChild(heartIcon);
+            imageDiv.appendChild(picture);
+            createOverlay(picture);
+
+            const bodyDiv = document.createElement('div');
+            bodyDiv.className = 'cards-card-body';
+
+            const fakeParagraph = document.createElement('p');
+            fakeParagraph.textContent = card.tags.map((tag) => `[${tag}]`).join(' ');
+            createTagScrollerFromParagraph(fakeParagraph);
+            bodyDiv.appendChild(fakeParagraph);
+
+            const titleEl = document.createElement('h4');
+            titleEl.innerHTML = `<strong>${card.title}</strong>`;
+            const descEl = document.createElement('h4');
+            descEl.textContent = card.description;
+            bodyDiv.append(titleEl, descEl);
+            li.append(imageDiv, bodyDiv);
+            favUl.appendChild(li);
+            heartIcon.addEventListener('click', () => {
+              fetch(`${config.backendUrl}/removeFavCard`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, image: card.image }),
+              })
+                .then((res) => {
+                  if (res.ok) {
+                    li.remove();
+                  } else {
+                    alert('Failed to remove card.');
+                  }
+                })
+                .catch((err) => {
+                  console.error('Error removing card:', err);
+                });
+            });
+          });
+        })
+        .catch((err) => {
+          console.error('Error loading favorite cards:', err);
+        });
+    }
+  }
 }
