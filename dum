@@ -1,7 +1,5 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
-const config = await fetch('/config.json').then((res) => res.json());
-
 function addShowMore(containerClassName, visibleCount) {
   const container = document.querySelector(`.${containerClassName}`);
   if (!container) return;
@@ -9,42 +7,50 @@ function addShowMore(containerClassName, visibleCount) {
   const ul = container.querySelector('ul');
   if (!ul) return;
 
-  const liItems = Array.from(ul.querySelectorAll('li'));
-  if (liItems.length <= visibleCount) return;
+  // Clone and remove all cards from the DOM
+  const allCards = Array.from(ul.querySelectorAll('li'));
+  ul.innerHTML = ''; // Clear list to lazy-load cards
 
-  // Hide items beyond visibleCount
-  liItems.forEach((li, index) => {
-    if (index >= visibleCount) {
-      li.style.display = 'none';
-      li.classList.add('hidden-card');
-    }
-  });
-
-  // Create and append "See More" button
+  let currentIndex = 0;
   const showMoreBtn = document.createElement('button');
-  showMoreBtn.className = 'show-more-button';
-  showMoreBtn.textContent = 'See More';
-  container.append(showMoreBtn);
+  function renderNextBatch() {
+    const end = Math.min(currentIndex + visibleCount, allCards.length);
+    for (let i = currentIndex; i < end; i += 1) {
+      ul.appendChild(allCards[i]);
+    }
+    currentIndex = end;
 
-  showMoreBtn.addEventListener('click', () => {
-    const hiddenCards = ul.querySelectorAll('.hidden-card');
-    hiddenCards.forEach((card) => {
-      card.style.display = '';
-      card.classList.remove('hidden-card');
-    });
-    showMoreBtn.remove();
-  });
+    if (currentIndex >= allCards.length) {
+      showMoreBtn.remove(); // All items loaded
+    }
+  }
+
+  // Initial render
+  renderNextBatch();
+
+  // Create and append "Show More" button
+
+  showMoreBtn.className = 'show-more-button';
+  showMoreBtn.textContent = 'Show More';
+  container.appendChild(showMoreBtn);
+  showMoreBtn.addEventListener('click', renderNextBatch);
+}
+function getRandomColor() {
+  const hue = Math.floor(Math.random() * 360);
+  const saturation = 70 + Math.random() * 10; // 70-80%
+  const lightness = 80 + Math.random() * 10; // 80-90%
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 function transformBlockToList(block) {
   const ul = document.createElement('ul');
-
   [...block.children].forEach((row) => {
     const li = document.createElement('li');
-
     while (row.firstElementChild) {
       li.append(row.firstElementChild);
     }
-
+    if (block.classList.contains('filter')) {
+      li.style.backgroundColor = getRandomColor();
+    }
     [...li.children].forEach((div) => {
       if (div.children.length === 1 && div.querySelector('picture')) {
         div.className = 'cards-card-image';
@@ -52,48 +58,43 @@ function transformBlockToList(block) {
         div.className = 'cards-card-body';
       }
     });
-
     ul.append(li);
   });
-
   // Optimize pictures
   ul.querySelectorAll('picture > img').forEach((img) => {
-    img.closest('picture').replaceWith(
-      createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }])
-    );
+    img
+      .closest('picture')
+      .replaceWith(
+        createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }]),
+      );
   });
-
   // Clear and append new list
   block.textContent = '';
   block.append(ul);
 }
+
 async function createTagScrollerFromParagraph(p) {
   const tagRegex = /\[([^\]]+)\]/g;
   const rawText = p.textContent;
-
   const wrapper = document.createElement('div');
   wrapper.classList.add('tag-scroll-container');
-
   const scroller = document.createElement('div');
   scroller.classList.add('tag-scroller');
-
   let match = tagRegex.exec(rawText);
   while (match) {
     const span = document.createElement('span');
     span.className = 'tag';
-    span.textContent = match[1]; // match[1] is the text inside []
+    const [, capturedText] = match;
+    span.textContent = capturedText;
     scroller.appendChild(span);
     match = tagRegex.exec(rawText);
   }
-
   const leftArrow = document.createElement('button');
   leftArrow.className = 'scroll-arrow scroll-left';
   leftArrow.setAttribute('aria-label', 'Scroll Left');
-
   const rightArrow = document.createElement('button');
   rightArrow.className = 'scroll-arrow scroll-right';
   rightArrow.setAttribute('aria-label', 'Scroll Right');
-
   async function loadSVG(button, iconPath) {
     try {
       const res = await fetch(iconPath);
@@ -103,108 +104,78 @@ async function createTagScrollerFromParagraph(p) {
       button.textContent = iconPath.includes('left') ? '←' : '→';
     }
   }
-
   await loadSVG(leftArrow, '/icons/left-arrow.svg');
   await loadSVG(rightArrow, '/icons/right-arrow.svg');
-
   leftArrow.addEventListener('click', () => {
     scroller.scrollBy({ left: -100, behavior: 'smooth' });
   });
   rightArrow.addEventListener('click', () => {
     scroller.scrollBy({ left: 100, behavior: 'smooth' });
   });
-
   wrapper.append(leftArrow, scroller, rightArrow);
-
   p.replaceWith(wrapper);
 }
-
-
-export default function decorate(block) {
-
-  const user = JSON.parse(localStorage.getItem('user'));
-  const userId = user?.id;
-  // limit show more button big
-  if (block.classList.contains('big') || block.classList.contains('category')) {
-  transformBlockToList(block);
-
-  if (block.classList.contains('big')) {
-    addShowMore('big', 3);
-  }
-  if (block.classList.contains('category')) {
-    addShowMore('category', 5);
-  }
+function createOverlay(picture) {
+  const overlay = document.createElement('div');
+  overlay.className = 'custom-overlay';
+  const openText = document.createElement('span');
+  openText.className = 'custom-open-text';
+  openText.textContent = 'Open';
+  overlay.appendChild(openText);
+  picture.insertAdjacentElement('afterend', overlay);
 }
 
-// masonry loayout
+async function createHeartIcon(picture, imgSrc, li, userId, isOnFavoritesPage) {
+  let isFavorited = false; // single declaration here
+  const heartIcon = document.createElement('span');
+  heartIcon.className = 'custom-heart';
+  heartIcon.style.cursor = 'pointer';
+  picture.appendChild(heartIcon);
 
-if (block.classList.contains('masonry')) {
-  
-  transformBlockToList(block);
-  block.querySelectorAll('.cards.masonry li p').forEach((p) => {
-  createTagScrollerFromParagraph(p);});
-  
-  const ul = block.querySelector('ul');
-  ul.querySelectorAll('.masonry .cards-card-image').forEach(async (imageWrapper) => {
-    imageWrapper.style.position = 'relative';
-    const picture = imageWrapper.querySelector('picture');
-    const img = picture?.querySelector('img');
-    if (!img) return;
+  const redheart = '/icons/favredheart.svg';
+  const whiteheart = '/icons/white-heart.svg';
 
-    const rawSrc = img.getAttribute('src') || '';
-    const basePath = 'https://main--pinterest--priyaku12.aem.page';
-    const imgSrc = rawSrc.startsWith('http') ? rawSrc : `${basePath}${rawSrc}`;
-
-    // --- Create heart icon (white by default) ---
-    const heartIcon = document.createElement('span');
-    heartIcon.className = 'custom-heart';
-    heartIcon.style.cursor = 'pointer';
-    picture.appendChild(heartIcon);
-
-    // --- Determine if image is already a favorite ---
-    let isFavorited = false;
+  async function loadIcon() {
+    const iconPath = isFavorited ? redheart : whiteheart;
     try {
-      const favRes = await fetch(
-        `${config.backendUrl}/isFavCard?userId=${userId}&image=${encodeURIComponent(imgSrc)}`,
-      );
-      const favData = await favRes.json();
-      isFavorited = favData?.favorited === true;
-    } catch (err) {
-      // console.error('Error checking favorite:', err);
+      const res = await fetch(iconPath);
+      const svg = await res.text();
+      heartIcon.innerHTML = svg;
+    } catch {
+      heartIcon.textContent = isFavorited ? '♥' : '♡';
+    }
+  }
+  function getFavorites() {
+    const allFavs = JSON.parse(localStorage.getItem('favorites') || '{}');
+    return allFavs[userId] || [];
+  }
+
+  function saveFavorites(favorites) {
+    const allFavs = JSON.parse(localStorage.getItem('favorites') || '{}');
+    allFavs[userId] = favorites;
+    localStorage.setItem('favorites', JSON.stringify(allFavs));
+  }
+
+  function isCardFavorited(imgSr) {
+    const favorites = getFavorites();
+    return favorites.some((card) => card.image === imgSr);
+  }
+
+  // IIFE to initialize
+  (async () => {
+    if (userId) {
+      isFavorited = isCardFavorited(imgSrc);
     }
 
-    const redheart = '/icons/favredheart.svg';
-    const whiteheart = '/icons/white-heart.svg';
+    await loadIcon();
 
-    async function loadIcon() {
-      const iconPath = isFavorited ? redheart : whiteheart;
-      try {
-        const res = await fetch(iconPath);
-        const svg = await res.text();
-        heartIcon.innerHTML = svg;
-      } catch (e) {
-        // console.error('Failed to load icon:', e);
-      }
-    }
-
-    loadIcon();
-
-    // Create overlay with Open button
-    const overlay = document.createElement('div');
-    overlay.className = 'custom-overlay';
-    const openText = document.createElement('span');
-    openText.className = 'custom-open-text';
-    openText.textContent = 'Open';
-    overlay.appendChild(openText);
-    picture.insertAdjacentElement('afterend', overlay);
-
-    // --- Click Listener to Add or Remove ---
-    heartIcon.addEventListener('click', () => {
+    heartIcon.addEventListener('click', async () => {
+      // make async here!
       if (!userId) {
         alert('Please login to save into favorites!');
         return;
       }
-      const li = imageWrapper.closest('li');
+
       const tags = Array.from(li.querySelectorAll('.tag')).map((tag) => tag.textContent.trim());
       const title = li.querySelector('h4 strong')?.textContent.trim() || '';
       const description = li.querySelectorAll('h4')[1]?.textContent.trim() || '';
@@ -217,170 +188,174 @@ if (block.classList.contains('masonry')) {
         description,
       };
 
+      let favorites = getFavorites();
+
       if (!isFavorited) {
-        // Add to favorites
-        fetch(`${config.backendUrl}/authFavCard`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(cardData),
-        }).then((res) => {
-          if (res.ok) {
-            isFavorited = true; // Update the flag
-            loadIcon();
-          } else {
-            alert('Failed to save card.');
-          }
-        }).catch((err) => {
-          console.error('Error saving card:', err);
-        });
+        // Add favorite
+        favorites.push(cardData);
+        saveFavorites(favorites);
+        isFavorited = true;
+        await loadIcon();
       } else {
-        // Remove from favorites
-        fetch(`${config.backendUrl}/removeFavCard`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, image: imgSrc }),
-        })
-          .then((res) => {
-            if (res.ok) {
-              isFavorited = false; // Update the flag
-              loadIcon();
-
-              // If on favorites page, remove card from UI
-              if (window.location.pathname.includes('favorites')) {
-                li.remove();
-              }
-            } else {
-              alert('Failed to remove card.');
-            }
-          })
-          .catch((err) => {
-            console.error('Error removing card:', err);
-          });
+        // Remove favorite
+        favorites = favorites.filter((card) => card.image !== imgSrc);
+        saveFavorites(favorites);
+        isFavorited = false;
+        await loadIcon();
+        if (isOnFavoritesPage) li.remove();
       }
     });
-  });
+  })();
 }
 
+export default function decorate(block) {
+  // limit show more button big
+  if (block.classList.contains('big') || block.classList.contains('category')) {
+    transformBlockToList(block);
+    if (block.classList.contains('big')) {
+      addShowMore('big', 3);
+    }
+    if (block.classList.contains('category')) {
+      addShowMore('category', 5);
+    }
+  }
 
+  if (block.classList.contains('filter')) {
+    transformBlockToList(block);
+  }
+  // masonry layout
+  if (block.classList.contains('masonry')) {
+    const user = JSON.parse(localStorage.getItem('loggedInUser'));
+    const userId = user?.username;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-///
-if (block.classList.contains('mas')) {
-  const ul = document.createElement('ul');
-  [...block.children].forEach((row) => {
-    const li = document.createElement('li');
-    while (row.firstElementChild) li.append(row.firstElementChild);
-    [...li.children].forEach((div) => {
-      if (div.children.length === 1 && div.querySelector('picture')) {
-        div.className = 'cards-card-image';
-      } else {
-        div.className = 'cards-card-body';
-      }
-    });
-    ul.append(li);
-  });
-
-  // Optimize pictures
-  ul.querySelectorAll('picture > img').forEach((img) => {
-    img.closest('picture').replaceWith(
-      createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }]),
-    );
-  });
-
-  // js for show more
-
-  // Clear and append new list
-  block.textContent = '';
-  block.append(ul);
-  block.classList.add('masonry');
-  const favUl = document.querySelector('.cards.mas.block ul');
-  fetch(`${config.backendUrl}/authFavCard?userId=${userId}`)
-    .then((res) => res.json())
-    .then((cardsData) => {
-      if (cardsData.length === 0) {
-        const favo = document.querySelector('.favourite h1');
-        favo.style.display = 'none';
-
-        const favBlock = document.querySelector('.mas');
-        const head = document.createElement('h2');
-        head.innerHTML = 'NO FAVOURITES FOUND';
-        head.className = 'nofav';
-        favBlock.append(head);
-        return;
-      }
-      cardsData.forEach((card) => {
-        const li = document.createElement('li');
-
-        const tagHTML = card.tags.map((tag) => `<span class="tag">${tag}</span>`).join('');
-
-        li.innerHTML = `
-          <div class="cards-card-image" style="position: relative;">
-            <picture>
-              <img src="${card.image}" alt="">
-               <span class="custom-heart">
-               <img src="/icons/favredheart.svg" alt="Favorite" width="24" height="24" />
-              </span>
-              
-            </picture>
-            <div class="custom-overlay">
-              <span class="custom-open-text">Open</span>
-            </div>
-          </div>
-          <div class="cards-card-body">
-            <div class="tag-scroll-container">
-              <div class="tag-scroller">
-                ${tagHTML}
-              </div>
-            </div>
-            <h4><strong>${card.title}</strong></h4>
-            <h4>${card.description}</h4>
-          </div>
-        `;
-
-        const heartIcon = li.querySelector('.custom-heart');
-        heartIcon.addEventListener('click', () => {
-          fetch(`${config.backendUrl}/removeFavCard`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              userId,
-              image: card.image,
-            }),
-          })
-            .then((res) => {
-              if (res.ok) {
-                li.remove(); // remove from DOM
-              } else {
-                alert('Failed to remove card.');
-              }
-            })
-            .catch((err) => {
-              console.error('Error removing card:', err);
-            });
-        });
-
-        favUl.appendChild(li);
+    // static block
+    if (block.classList.contains('static')) {
+      transformBlockToList(block);
+      const ul = block.querySelector('ul');
+      block.querySelectorAll('.cards.masonry li p').forEach((p) => {
+        createTagScrollerFromParagraph(p);
       });
-    })
-    .catch((err) => {
-      console.error('Error loading favorite cards:', err);
-    });
-}
+      // Process each image wrapper
+      const wrappers = ul.querySelectorAll('.cards-card-image');
 
-if (block.classList.contains('filter')) {
-  transformBlockToList(block);
-}
+      (async () => {
+        wrappers.forEach((imageWrapper) => {
+          const li = imageWrapper.closest('li');
+          const picture = imageWrapper.querySelector('picture');
+          const img = picture?.querySelector('img');
+
+          // If no image, skip
+          if (!img) return;
+
+          imageWrapper.style.position = 'relative';
+          const rawSrc = img.getAttribute('src') || '';
+          const basePath = 'https://main--pinterest--priyaku12.aem.page';
+          const imgSrc = rawSrc.startsWith('http')
+            ? rawSrc
+            : `${basePath}${rawSrc}`;
+
+          createHeartIcon(
+            picture,
+            imgSrc,
+            li,
+            userId,
+            window.location.pathname.includes('favorites'),
+          );
+          createOverlay(picture);
+        });
+      })();
+    }
+
+    if (block.classList.contains('dyanmic')) {
+      let favUl = block.querySelector('ul');
+      if (!favUl) {
+        favUl = document.createElement('ul');
+        block.appendChild(favUl);
+      }
+
+      // Get user favorites from localStorage
+      function getFavorites() {
+        const allFavs = JSON.parse(localStorage.getItem('favorites') || '{}');
+        return allFavs[userId] || [];
+      }
+
+      function saveFavorites(favorites) {
+        const allFavs = JSON.parse(localStorage.getItem('favorites') || '{}');
+        allFavs[userId] = favorites;
+        localStorage.setItem('favorites', JSON.stringify(allFavs));
+      }
+
+      const favoritesData = getFavorites();
+
+      if (!favoritesData || favoritesData.length === 0) {
+        const favo = document.querySelector('.favourite h1');
+        if (favo) favo.style.display = 'none';
+        const head = document.createElement('h2');
+        head.textContent = 'NO FAVOURITES FOUND';
+        head.className = 'nofav';
+        block.append(head);
+      } else {
+        favoritesData.forEach((card) => {
+          const li = document.createElement('li');
+          const imageDiv = document.createElement('div');
+          imageDiv.className = 'cards-card-image';
+          imageDiv.style.position = 'relative';
+
+          const picture = document.createElement('picture');
+          const img = document.createElement('img');
+          img.src = card.image;
+          img.alt = '';
+          picture.appendChild(img);
+
+          const heartIcon = document.createElement('span');
+          heartIcon.className = 'custom-heart';
+          heartIcon.style.cursor = 'pointer';
+
+          const heartImg = document.createElement('img');
+          heartImg.src = '/icons/favredheart.svg';
+          heartImg.alt = 'Favorite';
+          heartImg.width = 24;
+          heartImg.height = 24;
+          heartIcon.appendChild(heartImg);
+          picture.appendChild(heartIcon);
+          imageDiv.appendChild(picture);
+          createOverlay(picture);
+
+          const bodyDiv = document.createElement('div');
+          bodyDiv.className = 'cards-card-body';
+
+          const fakeParagraph = document.createElement('p');
+          fakeParagraph.textContent = card.tags
+            .map((tag) => `[${tag}]`)
+            .join(' ');
+          createTagScrollerFromParagraph(fakeParagraph);
+          bodyDiv.appendChild(fakeParagraph);
+
+          const titleEl = document.createElement('h4');
+          titleEl.innerHTML = `<strong>${card.title}</strong>`;
+          const descEl = document.createElement('h4');
+          descEl.textContent = card.description;
+          bodyDiv.append(titleEl, descEl);
+          li.append(imageDiv, bodyDiv);
+          favUl.appendChild(li);
+
+          heartIcon.addEventListener('click', () => {
+            // Remove card from localStorage favorites
+            let favorites = getFavorites();
+            favorites = favorites.filter((c) => c.image !== card.image);
+            saveFavorites(favorites);
+            li.remove();
+
+            // Optional: If no favorites left, show "No favorites" message
+            if (favorites.length === 0) {
+              const head = document.createElement('h2');
+              head.textContent = 'NO FAVOURITES FOUND';
+              head.className = 'nofav';
+              block.append(head);
+            }
+          });
+        });
+      }
+    }
+  }
 }

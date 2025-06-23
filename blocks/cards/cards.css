@@ -1,390 +1,377 @@
 .cards-wrapper {
-  margin-top: 12px;
+    margin-top: 12px;
 }
 
 .cards ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  grid-gap: 24px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-gap: 24px;
 }
 
 .cards .cards-card-body {
-  margin: 16px;
-  color: black;
+    margin: 16px;
+    color: black;
 }
 
 .cards.big ul {
-  grid-template-columns: repeat(1, 1fr);
-
+    grid-template-columns: repeat(1, 1fr);
 }
 
 .cards.filter li {
-  display: flex;
-  flex: 0 0 auto;
-  background-color: var(--card-filter);
-  border-radius: 18px;
+    display: flex;
+    flex: 0 0 auto;
+    background-color: var(--card-filter);
+    border-radius: 18px;
 }
 
 .cards.masonry li {
-  break-inside: avoid;
-  background: #fff;
-  overflow: hidden;
-  display: block;
+    break-inside: avoid;
+    background: #fff;
+    overflow: hidden;
+    display: block;
 }
 
 .cards.big ul li {
-  position: relative;
-  display: flex;
-  max-width: 350px;
+    position: relative;
+    display: flex;
+    max-width: 350px;
 }
 
 .cards.big .cards-card-image {
-  line-height: 0;
+    line-height: 0;
 
-  /* max-width: 404px; */
+    /* max-width: 404px; */
 }
 
 .cards.big .cards-card-body {
-  position: absolute;
-  padding-top: 24px;
-  padding-bottom: 24px;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  margin: 0;
-  color: white;
-  gap: 4px;
-  background-color: var(--card-body);
-  border-radius: 32px;
+    position: absolute;
+    padding-top: 24px;
+    padding-bottom: 24px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    margin: 0;
+    color: white;
+    gap: 4px;
+    background-color: var(--card-body);
+    border-radius: 32px;
 }
 
 .cards.big .cards-card-body h2 {
-  margin: 0;
+    margin: 0;
 }
 
 .cards.big .cards-card-body h4 {
-  margin: 0;
+    margin: 0;
 }
 
 .cards.big ul li img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: 32px;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 32px;
 }
 
-
 .cards.category ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  grid-gap: 0;
-
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-gap: 0;
 }
 
 .cards.category ul li {
-  position: relative;
-  display: flex;
-  height: 118px;
-  width: 236px;
-  margin-right: 16px;
-  margin-bottom: 16px;
+    position: relative;
+    display: flex;
+    height: 118px;
+    width: 236px;
+    margin-right: 16px;
+    margin-bottom: 16px;
 }
 
 .cards.category .cards-card-image {
-  line-height: 0;
-  width: 100%;
-  height: 100%;
+    line-height: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .cards.category ul li img {
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: 32px;
-
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 32px;
 }
 
 .cards.category .cards-card-body {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  color: var(--background-color);
-  background-color: var(--card-body);
-  border-radius: 32px;
-  place-content: center center;
-  padding: 16px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    color: var(--background-color);
+    background-color: var(--card-body);
+    border-radius: 32px;
+    place-content: center center;
+    padding: 16px;
 }
 
-
 .cards.cards.masonry {
-  margin-top: 18px;
+    margin-top: 18px;
 }
 
 .cards.filter ul {
-  height: 50px;
-  display: flex;
-  scrollbar-width: none;
-  overflow: auto hidden;
+    height: 50px;
+    display: flex;
+    scrollbar-width: none;
+    overflow: auto hidden;
 }
 
 .cards.masonry ul {
-  display: block;
-  column-count: 2;
-  column-gap: 16px;
-  padding: 0;
-  margin: 0;
-  list-style: none;
+    display: block;
+    column-count: 2;
+    column-gap: 16px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
 }
 
-
-
 .cards.masonry ul li img {
-  border-radius: 32px;
+    border-radius: 32px;
 }
 
 .cards.masonry .cards-card-body {
-  margin-top: 0;
-  margin-left: 0;
-  margin-right: 0;
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .cards.masonry .cards-card-body h4 {
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
 
-  /* limit the number of lines of text */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    /* limit the number of lines of text */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* heart */
 .cards.masonry .cards-card-image {
-  position: relative;
+    position: relative;
 }
 
 .cards.masonry .cards-card-image img {
-  transition: opacity 0.3s ease;
-  display: block;
-  width: 100%;
-  height: auto;
+    transition: opacity 0.3s ease;
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 .cards.masonry .custom-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgb(0 0 0 / 30%);
-  opacity: 0;
-  transition: all 0.3s ease;
-  pointer-events: none;
-  z-index: 1;
-  border-radius: 32px;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(0 0 0 / 30%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 32px;
 }
 
 .cards.masonry .custom-open-text {
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  z-index: 2;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 2;
 }
 
 .cards.masonry .custom-heart {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  font-size: 20px;
-  color: white;
-  z-index: 2;
-  pointer-events: auto;
-  cursor: pointer;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 20px;
+    color: white;
+    z-index: 2;
+    pointer-events: auto;
+    cursor: pointer;
 }
-.cards.masonry .custom-heart svg{
- width: 24px;
-  height: 24px;
+.cards.masonry .custom-heart svg {
+    width: 24px;
+    height: 24px;
 }
 
 .cards.filter li .cards-card-image img {
-  height: 100%;
-  width: 100%;
-  border-top-left-radius: 18px;
-  border-bottom-left-radius: 18px;
+    height: 100%;
+    width: 100%;
+    border-top-left-radius: 18px;
+    border-bottom-left-radius: 18px;
 }
 
 .cards.masonry .cards-card-image:hover img {
-  opacity: 0.6;
+    opacity: 0.6;
 }
 
 .cards.masonry .cards-card-image:hover .custom-overlay {
-  opacity: 1;
-  background-color: rgb(0 0 0 / 40%);
+    opacity: 1;
+    background-color: rgb(0 0 0 / 40%);
 }
 
 .cards .show-more-button {
-  display: block;
-  margin: 24px auto 0;
+    display: block;
+    margin: 24px auto 0;
 }
 
 .cards.masonry .custom-heart-wrapper {
-  cursor: pointer;
-  display: inline-flex;
-  gap: 4px;
-  font-size: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    gap: 4px;
+    font-size: 20px;
 }
-
 
 .cards.masonry .nofav {
-  text-align: center;
-  margin: 16px;
-  margin-top: 10%;
+    text-align: center;
+    margin: 16px;
+    margin-top: 10%;
 }
-
-
-
 
 /* tag scroller code */
 
 .cards.masonry .tag-scroll-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
 }
 
 .cards.masonry .tag-scroller {
-  display: flex;
-  align-items: center;
-  overflow-x: auto;
-  gap: 2px;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  cursor: grab;
-  flex: 1;
-  padding: 2px;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    gap: 2px;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+    flex: 1;
+    padding: 2px;
 }
 
 .cards.masonry .tag-scroller::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .cards.masonry .tag {
-  background-color: var(--link-color-grey);
-  border-radius: 32px;
-  padding: 4px 8px;
-  font-size: 12px;
-  white-space: nowrap;
-  flex: 0 0 auto;
-  color: var(--dark-color);
-  font-weight: 700;
+    background-color: var(--link-color-grey);
+    border-radius: 32px;
+    padding: 4px 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    color: var(--dark-color);
+    font-weight: 700;
 }
 
 /* Arrows inside container */
 .cards.masonry .scroll-arrow {
-  background: none;
-  border: none;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #666;
-  min-width: 24px;
-  min-height: 24px;
-  width: 10px;
-  height: 10px;
+    background: none;
+    border: none;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #666;
+    min-width: 24px;
+    min-height: 24px;
+    width: 10px;
+    height: 10px;
 }
 
 .cards.masonry .scroll-arrow svg {
-  fill: var(--dark-color);
-  display: block;
+    fill: var(--dark-color);
+    display: block;
 }
 
 /* Fading edges near arrows */
 .cards.masonry .tag-scroll-container::before,
 .cards.masonry .tag-scroll-container::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  width: 32px;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 32px;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .cards.masonry .tag-scroll-container::before {
-  left: 0;
-  background: linear-gradient(to right, #fff, transparent);
+    left: 0;
+    background: linear-gradient(to right, #fff, transparent);
 }
 
 .cards.masonry .tag-scroll-container::after {
-  right: 0;
-  background: linear-gradient(to left, #fff, transparent);
+    right: 0;
+    background: linear-gradient(to left, #fff, transparent);
 }
 
 .cards.filter .cards-card-body {
-  margin: 0;
+    margin: 0;
 }
 
 .cards.filter .cards-card-body p {
-  margin: 10px;
+    margin: 10px;
 }
 
-
 @media (width >=768px) {
-  .cards.big ul {
-    grid-template-columns: repeat(2, 1fr);
-  }
+    .cards.big ul {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
-  .cards.big ul li {
-    min-width: 350px;
-  }
+    .cards.big ul li {
+        min-width: 350px;
+    }
 
-  .cards.masonry ul {
-    column-count: 3;
-  }
+    .cards.masonry ul {
+        column-count: 3;
+    }
 
-  .cards.category ul {
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 0;
-  }
+    .cards.category ul {
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 0;
+    }
 }
 
 @media (width >=900px) {
-  .cards.big ul {
-    grid-template-columns: repeat(3, 1fr);
+    .cards.big ul {
+        grid-template-columns: repeat(3, 1fr);
+    }
 
-  }
+    .cards.big ul li {
+        min-width: 400px;
+    }
 
-  .cards.big ul li {
-    min-width: 400px;
-  }
+    .cards.masonry ul {
+        column-count: 5;
+    }
 
-  .cards.masonry ul {
-    column-count: 5;
-  }
-
-  .cards.category ul {
-    grid-template-columns: repeat(5, 1fr);
-    grid-gap: 0;
-  }
+    .cards.category ul {
+        grid-template-columns: repeat(5, 1fr);
+        grid-gap: 0;
+    }
 }

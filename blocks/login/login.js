@@ -12,7 +12,15 @@ export default function decorate(block) {
 
   block.appendChild(loginBox);
 
-  document.getElementById('login-btn').addEventListener('click', async function () {
+  if (!localStorage.getItem('users')) {
+    const mockUsers = [
+      { username: 'user', password: 'pass123' },
+      { username: 'admin', password: 'admin123' },
+    ];
+    localStorage.setItem('users', JSON.stringify(mockUsers));
+  }
+
+  document.getElementById('login-btn').addEventListener('click', async () => {
     const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value.trim();
     const msg = document.getElementById('message');
@@ -23,32 +31,28 @@ export default function decorate(block) {
       return;
     }
 
-    try {
-      const response = await fetch('http://localhost:8000/api/authroutes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: user, password: pass }),
-      });
+    // Get users from localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
 
-      const data = await response.json();
+    // Find matching user
+    const foundUser = users.find((u) => u.username === user && u.password === pass);
 
-      if (response.ok) {
-        
-        localStorage.setItem('user', JSON.stringify(data.user));
+    if (foundUser) {
+      // Save logged-in user info in localStorage
+      localStorage.setItem('loggedInUser', JSON.stringify({
+        username: foundUser.username,
+        password: foundUser.password,
+      }));
 
-        msg.textContent = data.message || 'Login successful!';
-        msg.style.color = 'green';
-        window.location.href= '/';
-        
-        
-      } else {
-        msg.textContent = data.message || 'Login failed.';
-        msg.style.color = 'red';
-      }
-    } catch (error) {
-      msg.textContent = 'Network error. Please try again.';
+      msg.textContent = 'Login successful!';
+      msg.style.color = 'green';
+
+      // Redirect after short delay so user sees the message
+      setTimeout(() => {
+        window.location.href = '/'; // Adjust to your home page URL
+      }, 1000);
+    } else {
+      msg.textContent = 'Invalid username or password.';
       msg.style.color = 'red';
     }
   });
