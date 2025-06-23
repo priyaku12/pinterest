@@ -84,7 +84,7 @@
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     grid-gap: 0;
 }
 
@@ -92,7 +92,7 @@
     position: relative;
     display: flex;
     height: 118px;
-    width: 236px;
+    /* width: 236px; */
     margin-right: 16px;
     margin-bottom: 16px;
 }
@@ -338,7 +338,7 @@
     margin: 10px;
 }
 
-@media (width >=768px) {
+@media (width >=600px) {
     .cards.big ul {
         grid-template-columns: repeat(2, 1fr);
     }

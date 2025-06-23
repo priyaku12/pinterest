@@ -157,9 +157,9 @@ header nav .nav-tools {
     padding-right: 5px;
 }
 
-@media (width >= 768px) and (width <= 899px) {
+@media (width >= 600px) and (width <= 899px) {
     header nav {
-        grid-template-columns: 13% 8% 60% 3% 11%;
+        grid-template-columns: 13% 8% 55% 4% 15%;
         gap: 1%;
     }
 
